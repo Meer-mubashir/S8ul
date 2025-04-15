@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>THE FINALS Kolkata Points Table</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      text-align: center;
+      color: #6a1b9a;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+    .day {
+    }
+    .soul {
+      margin-left: 140px;
+      color: #000000;
+    }
+    .imgg {
+      height: 160px;
+    }
+    .event-title {
+      color: #ff7043;
+      font-style: italic;
+      font-weight: normal;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      background-color: white;
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #6a1b9a;
+      color: white;
+      position: sticky;
+      top: 0;
+    }
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .winner {
+      background-color: #fff9c4;
+      position: relative;
+    }
+    .winner::after {
+      content: "🏆";
+      position: absolute;
+      right: 10px;
+    }
+    .btn {
+      background-color: #6a1b9a;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 10px 5px 10px 0;
+    }
+    .btn:hover {
+      background-color: #4a148c;
+    }
+    .btn-danger {
+      background-color: #f44336;
+    }
+    .btn-danger:hover {
+      background-color: #d32f2f;
+    }
+    .panel {
+      background-color: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .input-group {
+      display: flex;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+    .input-group label {
+      width: 200px;
+      font-weight: bold;
+    }
+    .input-group input {
+      padding: 8px;
+      width: 80px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    .winner-selector {
+      margin-left: 10px;
+    }
+    .highlight-options {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f3e5f5;
+      border-radius: 5px;
+      border-left: 5px solid #6a1b9a;
+    }
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .rank-column {
+      font-weight: bold;
+      text-align: center;
+    }
+    .top-three .rank-column {
+      color: #ff7043;
+      font-size: 1.2em;
+    }
+    #tableForExport {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+    }
+    #tableForExport table {
+      border: 2px solid #333;
+      box-shadow: none;
+    }
+    #tableForExport th {
+      background-color: #6a1b9a;
+      color: white;
+      border: 1px solid #333;
+    }
+    #tableForExport td {
+      border: 1px solid #333;
+      padding: 10px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: white;
+      margin: 15% auto;
+      padding: 20px;
+      border-radius: 5px;
+      width: 80%;
+      max-width: 400px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .input-label {
+      font-size: 0.8em;
+      margin-bottom: 2px;
+      color: #666;
+    }
+    .inputs-container {
+      display: flex;
+      gap: 10px;
+    }
+    .points-added {
+      font-weight: bold;
+      color: #009688;
+    }
+    .no-points-added {
+      color: #757575;
+    }
+  </style>
+</head>
+<body>
+  <h1>THE FINALS <span class="event-title">kolkata</span></h1>
+
+  <div class="panel">
+    <h2>Add Points</h2>
+    <div id="inputForm"></div>
+
+    <div class="highlight-options">
+      <h3>Match Winner</h3>
+      <p>Select the team that won the match:</p>
+      <select id="winnerSelect" class="winner-selector">
+        <option value="">-- Select Winner --</option>
+      </select>
+    </div>
+
+    <div class="action-buttons">
+      <button id="submitBtn" class="btn">Update Points Table</button>
+      <button id="downloadCsvBtn" class="btn">Download CSV</button>
+      <button id="downloadPngBtn" class="btn">Download PNG</button>
+      <button id="resetBtn" class="btn btn-danger">Reset All Points</button>
+    </div>
+  </div>
+
+  <div class="panel" id="tablePanel">
+    <div> 
+    <h1>THE FINALS <span class="event-title">kolkata</span></h1>
+    <a class="day">Day one | 25 April 2025</a><a class="soul">By Team Soul_X8bit</a>
+    <table id="pointsTable">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Team</th>
+          <th>M</th>
+          <th>W</th>
+          <th>F</th>
+          <th>T</th>
+          <th>+</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div id="tableForExport"></div>
+
+  <div id="resetModal" class="modal">
+    <div class="modal-content">
+      <h3>Reset Confirmation</h3>
+      <p>Are you sure you want to reset all points? This cannot be undone.</p>
+      <div class="modal-actions">
+        <button id="cancelResetBtn" class="btn">Cancel</button>
+        <button id="confirmResetBtn" class="btn btn-danger">Reset All Points</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script>
+    const teams = [
+      "Cincinnati Kids", "Hero Xtreme Godlike", "FS Esports", "Rivalry Mai",
+      "IQOO Reckoning", "True Rippers", "SOA Esports", "Team Versatile",
+      "Medal Esports", "ThuXmon8 Esports", "IQOO Orangutan", "4ever X RedXross",
+      "Genesis Esports", "IQOO SOUL", "Team Hades", "Bot Army Esports"
+    ];
+
+    // Load data from localStorage or initialize with default values
+    let teamsData = JSON.parse(localStorage.getItem('teamsPointsData')) || 
+      teams.map(name => ({ 
+        name, 
+        points: 0, 
+        frags: 0, 
+        wins: 0, 
+        matches: 0,
+        lastPointsAdded: 0,
+        lastFragsAdded: 0  // Track frags added separately
+      }));
+
+    function generateInputForm() {
+      const inputForm = document.getElementById('inputForm');
+      inputForm.innerHTML = '';
+      const winnerSelect = document.getElementById('winnerSelect');
+      winnerSelect.innerHTML = '<option value="">-- Select Winner --</option>';
+
+      teamsData.forEach(team => {
+        const div = document.createElement('div');
+        div.className = 'input-group';
+        
+        div.innerHTML = `
+          <label>${team.name}</label>
+          <div class="inputs-container">
+            <div>
+              <div class="input-label">Points</div>
+              <input type="number" data-team="${team.name}" data-type="points" min="0" placeholder="0" value="0"/>
+            </div>
+            <div>
+              <div class="input-label">F</div>
+              <input type="number" data-team="${team.name}" data-type="frags" min="0" placeholder="0" value="0"/>
+            </div>
+          </div>
+        `;
+        
+        inputForm.appendChild(div);
+
+        const option = document.createElement('option');
+        option.value = team.name;
+        option.textContent = team.name;
+        winnerSelect.appendChild(option);
+      });
+    }
+
+    function updatePointsTable() {
+      const inputs = document.querySelectorAll('#inputForm input');
+      const winnerName = document.getElementById('winnerSelect').value;
+      let anyInputEntered = false;
+      
+      // Reset all lastPointsAdded and lastFragsAdded values
+      teamsData.forEach(team => {
+        team.lastPointsAdded = 0;
+        team.lastFragsAdded = 0;
+      });
+      
+      // First check if any input values are entered (to determine if a match happened)
+      inputs.forEach(input => {
+        const val = parseInt(input.value) || 0;
+        if (val > 0) {
+          anyInputEntered = true;
+        }
+      });
+      
+      // If it's a match (any input entered or winner selected), increment match count for all teams
+      if (anyInputEntered || winnerName !== '') {
+        teamsData.forEach(team => {
+          team.matches += 1;
+        });
+      }
+
+      // Process input values and update points/frags
+      inputs.forEach(input => {
+        const teamName = input.getAttribute('data-team');
+        const dataType = input.getAttribute('data-type');
+        const team = teamsData.find(t => t.name === teamName);
+        const val = parseInt(input.value) || 0; // Default to 0 if NaN
+        
+        if (val > 0) {
+          if (dataType === 'points') {
+            team.points += val;
+            team.lastPointsAdded = val; // Only track the actual points, not frags
+          } else if (dataType === 'frags') {
+            team.frags += val;
+            team.lastFragsAdded = val; // Track frags separately
+          }
+        }
+        
+        // Reset the input value
+        input.value = "0";
+      });
+
+      // Update the winner
+      if (winnerName !== '') {
+        const winnerTeam = teamsData.find(t => t.name === winnerName);
+        if (winnerTeam) winnerTeam.wins += 1;
+      }
+
+      // Sort teams by total points (points + frags)
+      teamsData.sort((a, b) => {
+        const totalA = a.points;
+        const totalB = b.points;
+        if (totalB !== totalA) return totalB - totalA;
+        if (b.wins !== a.wins) return b.wins - a.wins;
+        return b.frags - a.frags;
+      });
+      
+      // Save to localStorage
+      localStorage.setItem('teamsPointsData', JSON.stringify(teamsData));
+      
+      // Update table UI
+      renderTable();
+      
+      // Reset winner selection
+      document.getElementById('winnerSelect').value = '';
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      
+      teamsData.forEach((team, index) => {
+        const tr = document.createElement('tr');
+        if (index < 3) tr.classList.add('top-three');
+        if (team.wins > 0) tr.classList.add('winner');
+        
+        // Ensure values are numbers, not NaN
+        const matches = isNaN(team.matches) ? 0 : team.matches;
+        const wins = isNaN(team.wins) ? 0 : team.wins;
+        const frags = isNaN(team.frags) ? 0 : team.frags;
+        const points = isNaN(team.points) ? 0 : team.points;
+        
+        // T column now shows only points (not combined with frags)
+        const totalPoints = points;
+        
+        // We'll only show team points (not frags) in the "+" column
+        const lastPointsAdded = isNaN(team.lastPointsAdded) ? 0 : team.lastPointsAdded;
+        
+        // Format the points added column - this shows only points added in last match (not frags)
+        let pointsAddedDisplay = '';
+        if (lastPointsAdded > 0) {
+          pointsAddedDisplay = `<span class="points-added">+${lastPointsAdded}</span>`;
+        } else {
+          pointsAddedDisplay = `<span class="no-points-added">+0</span>`;
+        }
+        
+        tr.innerHTML = `
+          <td class="rank-column">${index + 1}</td>
+          <td>${team.name}</td>
+          <td>${matches}</td>
+          <td>${wins}</td>
+          <td>${frags}</td>
+          <td>${totalPoints}</td>
+          <td>${pointsAddedDisplay}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function downloadTableAsCsv() {
+      let csv = "Rank,Team,M,W,F,T,+\n";
+      teamsData.forEach((team, i) => {
+        const matches = isNaN(team.matches) ? 0 : team.matches;
+        const wins = isNaN(team.wins) ? 0 : team.wins;
+        const frags = isNaN(team.frags) ? 0 : team.frags;
+        const points = isNaN(team.points) ? 0 : team.points;
+        const totalPoints = points;
+        const lastPointsAdded = isNaN(team.lastPointsAdded) ? 0 : team.lastPointsAdded;
+        
+        csv += `${i + 1},${team.name},${matches},${wins},${frags},${totalPoints},+${lastPointsAdded}\n`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'the_finals_kolkata_table.csv';
+      a.click();
+    }
+
+    function downloadTableAsPng() {
+      const tablePanel = document.getElementById('tablePanel');
+      
+      // Create the export div
+      const exportDiv = document.getElementById('tableForExport');
+      exportDiv.style.display = 'block';
+      exportDiv.style.position = 'relative';
+      exportDiv.style.width = '800px';
+      exportDiv.style.backgroundColor = 'white';
+      exportDiv.style.padding = '20px';
+      
+      exportDiv.innerHTML = `
+        <div style="padding: 20px; background-color: white;">
+          <h2 style="text-align: center; margin-bottom: 20px; color: #6a1b9a;">THE FINALS <span style="color: #ff7043;">kolkata</span> Points Table</h2>
+          <table border="1" cellpadding="8" style="width: 100%; border-collapse: collapse; margin: 0 auto;">
+            <thead>
+              <tr style="background-color: #6a1b9a; color: white;">
+                <th>Rank</th><th>Team</th><th>M</th><th>W</th><th>F</th><th>T</th><th>+</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${teamsData.map((t, i) => {
+                const matches = isNaN(t.matches) ? 0 : t.matches;
+                const wins = isNaN(t.wins) ? 0 : t.wins;
+                const frags = isNaN(t.frags) ? 0 : t.frags;
+                const points = isNaN(t.points) ? 0 : t.points;
+                const totalPoints = points;
+                const lastPointsAdded = isNaN(t.lastPointsAdded) ? 0 : t.lastPointsAdded;
+                
+                let lastPointsClass = lastPointsAdded > 0 ? 'color: #009688; font-weight: bold;' : 'color: #757575;';
+                
+                return `
+                <tr style="${t.wins > 0 ? 'background-color: #fff9c4;' : ''}">
+                  <td style="text-align: center; font-weight: bold; ${i < 3 ? 'color: #ff7043;' : ''}">${i + 1}</td>
+                  <td>${t.name}${t.wins > 0 ? ' 🏆' : ''}</td>
+                  <td>${matches}</td>
+                  <td>${wins}</td>
+                  <td>${frags}</td>
+                  <td>${totalPoints}</td>
+                  <td style="${lastPointsClass}">+${lastPointsAdded}</td>
+                </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      document.body.appendChild(exportDiv);
+      
+      // Use html2canvas to capture the export div
+      html2canvas(exportDiv, { 
+        scale: 2,
+        backgroundColor: 'white',
+        logging: true,
+        useCORS: true
+      }).then(canvas => {
+        try {
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL("image/png");
+          a.download = 'the_finals_kolkata_table.png';
+          a.click();
+          
+          // Hide the export div when done
+          exportDiv.style.display = 'none';
+          exportDiv.style.position = 'absolute';
+          exportDiv.style.left = '-9999px';
+        } catch (error) {
+          console.error("Error generating PNG:", error);
+          alert("Error generating PNG. Please try again.");
+        }
+      }).catch(error => {
+        console.error("Canvas error:", error);
+        alert("Error generating PNG. Please try again.");
+      });
+    }
+
+    function showResetConfirmation() {
+      document.getElementById('resetModal').style.display = 'block';
+    }
+
+    function hideResetConfirmation() {
+      document.getElementById('resetModal').style.display = 'none';
+    }
+
+    function resetAllPoints() {
+      teamsData = teams.map(name => ({ 
+        name, 
+        points: 0, 
+        frags: 0, 
+        wins: 0, 
+        matches: 0,
+        lastPointsAdded: 0,
+        lastFragsAdded: 0
+      }));
+      localStorage.setItem('teamsPointsData', JSON.stringify(teamsData));
+      renderTable();
+      hideResetConfirmation();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      generateInputForm();
+      renderTable();
+      document.getElementById('submitBtn').addEventListener('click', updatePointsTable);
+      document.getElementById('downloadCsvBtn').addEventListener('click', downloadTableAsCsv);
+      document.getElementById('downloadPngBtn').addEventListener('click', downloadTableAsPng);
+      document.getElementById('resetBtn').addEventListener('click', showResetConfirmation);
+      document.getElementById('cancelResetBtn').addEventListener('click', hideResetConfirmation);
+      document.getElementById('confirmResetBtn').addEventListener('click', resetAllPoints);
+    });
+  </script>
+</body>
+</html>
